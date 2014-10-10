@@ -1,0 +1,4 @@
+1. 测试准备
+	建表 ：create 'test_info', { NAME => 'info', COMPRESSION => 'snappy' } 
+2. Put测试
+	

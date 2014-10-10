@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,23 +18,16 @@ import org.apache.hadoop.hbase.thrift.generated.TRowResult;
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransportException;
 
-import com.wankun.hbasetest.util.LogMessage;
-import com.wankun.hbasetest.util.RowCounter;
+import com.google.common.base.Stopwatch;
 
 public class TestGet {
 
-	public static Log log = LogFactory.getLog(TestGet.class);
+	public static Log logger = LogFactory.getLog(TestGet.class);
 	private static final String CHARSET = "UTF-8";
-	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private DecimalFormat rowKeyFormatter = new DecimalFormat("0000000000000");
 	private final AbstractHBaseThriftService client;
 
 	private List<String> columns = null;
-
-	// 记录日志的线程
-	private RowCounter rowCounter;
-	private LogMessage logmsg;
-	private Thread logmsgth;
 
 	private TestGet(String host, int port) {
 		client = new HBaseThriftClient(host, port);
@@ -45,9 +40,6 @@ public class TestGet {
 
 	public TestGet() {
 		this("h2namenode1", 9090);
-		rowCounter = new RowCounter();
-		logmsg = new LogMessage(rowCounter);
-		logmsgth = new Thread(logmsg);
 		initColumns();
 	}
 
@@ -56,10 +48,26 @@ public class TestGet {
 		test.runTest();
 	}
 
+	public static int rownum = 0;
+
 	public void runTest() {
-		logmsgth.start();
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date d1 = new Date();
-		log.info("开始测试时间：" + sdf.format(d1));
+
+		new Timer(true).schedule(new TimerTask() {
+			long lastcount = 0;
+
+			@Override
+			public void run() {
+				logger.info("LogMessage \t[allrow] : " + rownum + "\t\t  [rate]" + (rownum - lastcount));
+				lastcount = rownum;
+			}
+
+		}, 0, 1000);
+		logger.info("开始测试时间：" + sdf.format(d1));
+		Stopwatch watch = new Stopwatch();
+		watch.start();
 
 		Map<String, String> attributes = new HashMap<String, String>(0);
 		List<String> rows;
@@ -70,16 +78,16 @@ public class TestGet {
 				rows = new ArrayList<String>();
 				rows.add(rowKey);
 				List<TRowResult> results = client.getRowsWithColumns("test_info", rows, columns, attributes);
-				rowCounter.countUp();
+				rownum++;
 			} catch (TException e) {
 				e.printStackTrace();
 			}
 		}
 
-		logmsg.setRunflag(false);
-		Date d2 = new Date();
-		int runtime = (int) (d2.getTime() - d1.getTime()) / 1000;
-		log.info("结束测试时间：" + sdf.format(d2) + " 测试运行时间：" + runtime + " 成功插入数据量：" + rowCounter.getRownum());
+		watch.stop();
+		logger.info("结束测试");
+		logger.info("测试运行时间:" + watch.elapsedMillis() + " 成功操作数据量：" + rownum + "  平均处理效率：" + rownum * 1000.0
+				/ watch.elapsedMillis());
 	}
 
 	static ByteBuffer wrap(String value) {

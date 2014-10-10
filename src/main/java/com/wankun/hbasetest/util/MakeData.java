@@ -15,15 +15,17 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 /**
  * 负责产生测试数据
+ * 
  * @author wankun
- *
+ * 
  */
-public class MakeData implements Runnable {
+public class MakeData extends Thread {
 
-	Log log = LogFactory.getLog(MakeData.class);
-	private Boolean runflag=true;
+	Log logger = LogFactory.getLog(MakeData.class);
 	private BlockingQueue<GprsBean> queue = new LinkedBlockingQueue<GprsBean>(500);
+
 	public MakeData() {
+		this.setDaemon(true);
 	}
 
 	public BlockingQueue<GprsBean> getQueue() {
@@ -32,20 +34,16 @@ public class MakeData implements Runnable {
 
 	@Override
 	public void run() {
-		while (runflag) {
-			synchronized (queue) {
-				if(queue.size()< 500){
-					GprsBean gb = genBean();
-					try {
-						queue.put(gb);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
+		while (true) {
+			GprsBean gb = genBean();
+			try {
+				queue.put(gb);
+			} catch (InterruptedException e) {
+				logger.error("queue插入数据失败", e);
 			}
 		}
 	}
-	
+
 	static DecimalFormat formatter = new DecimalFormat("00");
 
 	public static String randomlyBirthday() {
@@ -67,19 +65,19 @@ public class MakeData implements Runnable {
 		int flag = 1 + r.nextInt(10);
 		return String.valueOf(flag);
 	}
-	
-	private GprsBean genBean(){
+
+	private GprsBean genBean() {
 		GprsBean gb = new GprsBean();
 		gb.setA_BRAND_ID((int) (Math.random() * 100));
 		gb.setA_SERV_TYPE("13");
 		gb.setACC_FILE_NAME("null");
 		gb.setACC_TIME("null");
-		gb.setACCU_USER_ID1(String.valueOf((long)(Math.random() *100000000) *  10000000));
-		gb.setACCU_USER_ID2(String.valueOf((long)(Math.random() * 100000000) * 10000000));
-		gb.setACCU_USER_ID3(String.valueOf((long)(Math.random() * 100000000 * 10000000)));
-		gb.setACCU_USER_ID4(String.valueOf((long)(Math.random() * 100000000 * 10000000)));
+		gb.setACCU_USER_ID1(String.valueOf((long) (Math.random() * 100000000) * 10000000));
+		gb.setACCU_USER_ID2(String.valueOf((long) (Math.random() * 100000000) * 10000000));
+		gb.setACCU_USER_ID3(String.valueOf((long) (Math.random() * 100000000 * 10000000)));
+		gb.setACCU_USER_ID4(String.valueOf((long) (Math.random() * 100000000 * 10000000)));
 		gb.setAPNNI("cmnet");
-		gb.setAPNNI_GROUPID(String.valueOf((int)(Math.random() * 100)));
+		gb.setAPNNI_GROUPID(String.valueOf((int) (Math.random() * 100)));
 		gb.setAPNOI("null");
 		gb.setBASE_TPREMARK("0|0000000000|2381:3144|;");
 		gb.setBILL_END_DAY(20130531);// 账期结束时间 是否随机？
@@ -88,26 +86,27 @@ public class MakeData implements Runnable {
 		gb.setBILLING_CYCLE(String.valueOf(201305));
 		gb.setBUSI_DOMAIN("null");
 		gb.setCALL_DURATION((int) (Math.random() * 100000));
-		gb.setCAUSE_CLOSE(String.valueOf((int)(Math.random() * 10)));// ////////////////////
-		gb.setCDR_DAY(Integer.parseInt((new SimpleDateFormat("yyyyMMdd")).format(randomDate("2013-10-01", "2013-10-31"))));// 是否要随机
+		gb.setCAUSE_CLOSE(String.valueOf((int) (Math.random() * 10)));// ////////////////////
+		gb.setCDR_DAY(Integer.parseInt((new SimpleDateFormat("yyyyMMdd"))
+				.format(randomDate("2013-10-01", "2013-10-31"))));// 是否要随机
 		gb.setCELL_ID("null");
-		gb.setCFEE((long) ((int)(Math.random() * 1000000)));
+		gb.setCFEE((long) ((int) (Math.random() * 1000000)));
 		gb.setCHAN_NO("N001");// 是否需要随机
-		gb.setCHARGING_ID(String.valueOf((long)(Math.random() * 100000000 * 10000000)));
+		gb.setCHARGING_ID(String.valueOf((long) (Math.random() * 100000000 * 10000000)));
 		gb.setCUST_ID("null");
-		gb.setDATA_DOWN1((long) ((int)(Math.random() * 1000000)));
-		gb.setDATA_DOWN2((long) ((int)(Math.random() * 1000000)));
-		gb.setDATA_DOWN3((long) ((int)(Math.random() * 1000000)));
-		gb.setDATA_DOWN4((long) ((int)(Math.random() * 1000000)));
-		gb.setDATA_DOWN5((long) ((int)(Math.random() * 1000000)));
-		gb.setDATA_DOWN6((long) ((int)(Math.random() * 1000000)));
-		gb.setDATA_UP1((long) ((int)(Math.random() * 1000000)));
-		gb.setDATA_UP2((long) ((int)(Math.random() * 1000000)));
-		gb.setDATA_UP3((long) ((int)(Math.random() * 1000000)));
-		gb.setDATA_UP4((long) ((int)(Math.random() * 1000000)));
-		gb.setDATA_UP5((long) ((int)(Math.random() * 1000000)));
-		gb.setDATA_UP6((long) ((int)(Math.random() * 1000000)));
-		gb.setDEAL_TIME(String.valueOf((int)(Math.random() * 100000000)));// 处理时间秒数
+		gb.setDATA_DOWN1((long) ((int) (Math.random() * 1000000)));
+		gb.setDATA_DOWN2((long) ((int) (Math.random() * 1000000)));
+		gb.setDATA_DOWN3((long) ((int) (Math.random() * 1000000)));
+		gb.setDATA_DOWN4((long) ((int) (Math.random() * 1000000)));
+		gb.setDATA_DOWN5((long) ((int) (Math.random() * 1000000)));
+		gb.setDATA_DOWN6((long) ((int) (Math.random() * 1000000)));
+		gb.setDATA_UP1((long) ((int) (Math.random() * 1000000)));
+		gb.setDATA_UP2((long) ((int) (Math.random() * 1000000)));
+		gb.setDATA_UP3((long) ((int) (Math.random() * 1000000)));
+		gb.setDATA_UP4((long) ((int) (Math.random() * 1000000)));
+		gb.setDATA_UP5((long) ((int) (Math.random() * 1000000)));
+		gb.setDATA_UP6((long) ((int) (Math.random() * 1000000)));
+		gb.setDEAL_TIME(String.valueOf((int) (Math.random() * 100000000)));// 处理时间秒数
 		gb.setDEDUCT_REMARK("null");
 		gb.setDEDUCT_REMARK2("##");
 		gb.setDIS_FILE_NAME("DGGP");
@@ -118,22 +117,22 @@ public class MakeData implements Runnable {
 		gb.setDURATION4((int) (Math.random() * 1000000));
 		gb.setDURATION5((int) (Math.random() * 1000000));
 		gb.setDURATION6((int) (Math.random() * 1000000));
-		gb.setERROR_CODE(String.valueOf((int)(Math.random() * 10000000)));
+		gb.setERROR_CODE(String.valueOf((int) (Math.random() * 10000000)));
 		gb.setFEE1((long) 0);
 		gb.setFEE2((long) 0);
 		gb.setFEE3((long) 0);
-		gb.setFEE_TYPE(String.valueOf((int)Math.random() * 10));
+		gb.setFEE_TYPE(String.valueOf((int) Math.random() * 10));
 		gb.setFILE_NO("0GGEA7105031355.3312");
 		gb.setFILE_PP_NAME("null");
-		gb.setFREE1((long) ((int)(Math.random() * 1000000)));
-		gb.setFREE2((long) ((int)(Math.random() * 1000000)));
-		gb.setFREE3((long) ((int)(Math.random() * 1000000)));
-		gb.setFREE4((long) ((int)(Math.random() * 1000000)));
-		gb.setFREE_CODE(String.valueOf((int)(Math.random() * 100000000)));
-		gb.setFREE_CODE1(String.valueOf((int)(Math.random() * 100000000)));
-		gb.setFREE_CODE2(String.valueOf((int)(Math.random() * 100000000)));
-		gb.setFREE_CODE3(String.valueOf((int)(Math.random() * 100000000)));
-		gb.setFREE_CODE4(String.valueOf((int)(Math.random() * 100000000)));
+		gb.setFREE1((long) ((int) (Math.random() * 1000000)));
+		gb.setFREE2((long) ((int) (Math.random() * 1000000)));
+		gb.setFREE3((long) ((int) (Math.random() * 1000000)));
+		gb.setFREE4((long) ((int) (Math.random() * 1000000)));
+		gb.setFREE_CODE(String.valueOf((int) (Math.random() * 100000000)));
+		gb.setFREE_CODE1(String.valueOf((int) (Math.random() * 100000000)));
+		gb.setFREE_CODE2(String.valueOf((int) (Math.random() * 100000000)));
+		gb.setFREE_CODE3(String.valueOf((int) (Math.random() * 100000000)));
+		gb.setFREE_CODE4(String.valueOf((int) (Math.random() * 100000000)));
 		gb.setFREE_FEE1(0);
 		gb.setFREE_FEE2(0);
 		gb.setFREE_FEE3(0);
@@ -143,26 +142,26 @@ public class MakeData implements Runnable {
 		gb.setFREE_ITEM3((int) (Math.random() * 10000));
 		gb.setFREE_ITEM4((int) (Math.random() * 10000));
 		gb.setGGSN("DDB18B82");
-		gb.setHOME_AREA_CODE(String.valueOf((int)(Math.random() * 1000)));// 归属地
-		gb.setIMEI(String.valueOf((long)(Math.random() * 100000000 * 100000000)));// IMEI
-																				// 16位
-		gb.setIMSI_NUMBER(String.valueOf((long)(Math.random() * 100000000 * 10000000)));// IMSI
-																						// 15位
-		gb.setINSTANCE_ID1(String.valueOf((long)(Math.random() * 100000000 * 100000)));
-		gb.setINSTANCE_ID2(String.valueOf((long)(Math.random() * 100000000 * 1000000)));
-		gb.setINSTANCE_ID3(String.valueOf((long)(Math.random() * 100000000 * 1000000)));
-		gb.setINSTANCE_ID4(String.valueOf((long)(Math.random() * 100000000 * 1000000)));
+		gb.setHOME_AREA_CODE(String.valueOf((int) (Math.random() * 1000)));// 归属地
+		gb.setIMEI(String.valueOf((long) (Math.random() * 100000000 * 100000000)));// IMEI
+																					// 16位
+		gb.setIMSI_NUMBER(String.valueOf((long) (Math.random() * 100000000 * 10000000)));// IMSI
+																							// 15位
+		gb.setINSTANCE_ID1(String.valueOf((long) (Math.random() * 100000000 * 100000)));
+		gb.setINSTANCE_ID2(String.valueOf((long) (Math.random() * 100000000 * 1000000)));
+		gb.setINSTANCE_ID3(String.valueOf((long) (Math.random() * 100000000 * 1000000)));
+		gb.setINSTANCE_ID4(String.valueOf((long) (Math.random() * 100000000 * 1000000)));
 		gb.setLAC("null");
-		gb.setMSISDN(String.valueOf((long)(Math.random() * 100000000 * 1000)));// 手机号
+		gb.setMSISDN(String.valueOf((long) (Math.random() * 100000000 * 1000)));// 手机号
 		gb.setMSNC('2');
 		gb.setNI_PDP('0');
-		gb.setOFFICE_CODE(String.valueOf((int)(Math.random() * 10000)));// 归属地市
-		gb.setPAY_MODE((short)1);//
+		gb.setOFFICE_CODE(String.valueOf((int) (Math.random() * 10000)));// 归属地市
+		gb.setPAY_MODE((short) 1);//
 		gb.setPDP_TYPE('1');
-		gb.setPRODUCT_ID1(String.valueOf((long)(Math.random() * 100000000 * 1000000)));
-		gb.setPRODUCT_ID2(String.valueOf((long)(Math.random() * 100000000 * 1000000)));
-		gb.setPRODUCT_ID3(String.valueOf((long)(Math.random() * 100000000 * 1000000)));
-		gb.setPRODUCT_ID4(String.valueOf((long)(Math.random() * 100000000 * 1000000)));
+		gb.setPRODUCT_ID1(String.valueOf((long) (Math.random() * 100000000 * 1000000)));
+		gb.setPRODUCT_ID2(String.valueOf((long) (Math.random() * 100000000 * 1000000)));
+		gb.setPRODUCT_ID3(String.valueOf((long) (Math.random() * 100000000 * 1000000)));
+		gb.setPRODUCT_ID4(String.valueOf((long) (Math.random() * 100000000 * 1000000)));
 		gb.setRA("null");
 		gb.setRATE_FILE_NAME("null");
 		gb.setRATE_ITEM_ID1(String.valueOf(0));
@@ -174,9 +173,9 @@ public class MakeData implements Runnable {
 		gb.setRECORD_TYPE('1');
 		gb.setRECORDEXTENSION("2000000002|0|3762|784|0");
 		gb.setRESULT('1');
-		gb.setREVISION((short)(int) (Math.random() * 10));
+		gb.setREVISION((short) (int) (Math.random() * 10));
 		gb.setROAM_TYPE('0');
-		gb.setSERVICE_TYPE(String.valueOf((int)(Math.random() * 100)));
+		gb.setSERVICE_TYPE(String.valueOf((int) (Math.random() * 100)));
 		gb.setSGSN("DDB1D690");
 		gb.setSGSN_CHANGE('X');
 		gb.setSOURCE_TYPE("M");
@@ -191,64 +190,55 @@ public class MakeData implements Runnable {
 		gb.setTARIFF6('F');
 		gb.setTOTAL_FEE((long) 0);
 		gb.setTPREMARK("31441|1|0|1#");
-		gb.setUSER_ID((long) ((long)(Math.random() *100000000 *100000000)));
+		gb.setUSER_ID((long) ((long) (Math.random() * 100000000 * 100000000)));
 		gb.setUSER_TYPE(String.valueOf(0));
-		gb.setVISIT_AREA_CODE(String.valueOf((int)(Math.random() * 1000)));// 到访地区号
+		gb.setVISIT_AREA_CODE(String.valueOf((int) (Math.random() * 1000)));// 到访地区号
 		gb.setVISIT_COUNTY("null");
 		gb.setRATE_TIME((new SimpleDateFormat("hhmmss")).format(randomTime("00:00:00", "24:59:59")));
 		return gb;
 	}
-	
-	
+
 	private static Date randomDate(String beginDate, String endDate) {
-	    try {
-	        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-	        Date start = format.parse(beginDate);// 开始日期
-	        Date end = format.parse(endDate);// 结束日期
-	        if (start.getTime() >= end.getTime()) {
-	            return null;
-	        }
-	        long date = random(start.getTime(), end.getTime());
-	        return new Date(date);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return null;
+		try {
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+			Date start = format.parse(beginDate);// 开始日期
+			Date end = format.parse(endDate);// 结束日期
+			if (start.getTime() >= end.getTime()) {
+				return null;
+			}
+			long date = random(start.getTime(), end.getTime());
+			return new Date(date);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private static Date randomTime(String beginDate, String endDate) {
-	    try {
-	        SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
-	        Date start = format.parse(beginDate);// 开始日期
-	        Date end = format.parse(endDate);// 结束日期
-	        if (start.getTime() >= end.getTime()) {
-	            return null;
-	        }
-	        long date = random(start.getTime(), end.getTime());
-	        return new Date(date);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return null;
+		try {
+			SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
+			Date start = format.parse(beginDate);// 开始日期
+			Date end = format.parse(endDate);// 结束日期
+			if (start.getTime() >= end.getTime()) {
+				return null;
+			}
+			long date = random(start.getTime(), end.getTime());
+			return new Date(date);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private static long random(long begin, long end) {
-	    long rtnn = begin + (long) (Math.random() * (end - begin));
-	    if (rtnn == begin || rtnn == end) {
-	        return random(begin, end);
-	    }
-	    return rtnn;
-	  }
-
-	public Boolean getRunflag() {
-		return runflag;
+		long rtnn = begin + (long) (Math.random() * (end - begin));
+		if (rtnn == begin || rtnn == end) {
+			return random(begin, end);
+		}
+		return rtnn;
 	}
 
-	public void setRunflag(Boolean runflag) {
-		this.runflag = runflag;
-	}
-
-	public static Put genPut(MakeData md,String rowKey) throws InterruptedException {
+	public static Put genPut(MakeData md, String rowKey) throws InterruptedException {
 		Put put = new Put(Bytes.toBytes(rowKey));
 		GprsBean gb = md.getQueue().take();
 		put.add(Bytes.toBytes("info"), Bytes.toBytes("source_type"), Bytes.toBytes(gb.getSOURCE_TYPE()));
@@ -377,134 +367,134 @@ public class MakeData implements Runnable {
 		put.add(Bytes.toBytes("info"), Bytes.toBytes("bill_end_day"), Bytes.toBytes(gb.getBILL_END_DAY()));
 		return put;
 	}
-	
+
 	public static Get genGet(String rowKey) throws InterruptedException {
 		Get get = new Get(Bytes.toBytes(rowKey));
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("source_type")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("record_type")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("ni_pdp")            );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("msisdn")            );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("imsi_number")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("sgsn")              );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("msnc")              );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("lac")               );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("ra")                );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("cell_id")           );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("charging_id")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("ggsn")              );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("apnni")             );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("apnoi")             );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("pdp_type")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("spa")               );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("sgsn_change")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("cause_close")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("result")            );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("home_area_code")    );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("visit_area_code")   );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("user_type")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("fee_type")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("roam_type")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("service_type")      );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("start_date")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("start_time")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("call_duration")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("tariff1")           );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("data_up1")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("data_down1")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("duration1")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("tariff2")           );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("data_up2")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("data_down2")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("duration2")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("tariff3")           );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("data_up3")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("data_down3")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("duration3")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("tariff4")           );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("data_up4")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("data_down4")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("duration4")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("tariff5")           );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("data_up5")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("data_down5")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("duration5")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("tariff6")           );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("data_up6")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("data_down6")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("duration6")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("cfee")              );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("fee1")              );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("fee2")              );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("fee3")              );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("total_fee")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("deal_time")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("file_no")           );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("error_code")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("cust_id")           );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("user_id")           );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("a_brand_id")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("pay_mode")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("a_serv_type")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("chan_no")           );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("office_code")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_code")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("billing_cycle")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("bill_start_day")    );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("revision")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("cdr_day")           );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("file_pp_name")      );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("visit_county")      );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("deduct_remark")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("deduct_remark2")    );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("imei")              );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("recordextension")   );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("billinfo")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("rcdseqnum")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("apnni_groupid")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_item1")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free1")             );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("product_id1")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("instance_id1")      );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("accu_user_id1")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_item2")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free2")             );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("product_id2")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("instance_id2")      );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("accu_user_id2")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_item3")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free3")             );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("product_id3")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("instance_id3")      );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("accu_user_id3")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_item4")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free4")             );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("product_id4")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("instance_id4")      );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("accu_user_id4")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("ratemethod")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_code1")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_fee1")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("rate_item_id1")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_code2")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_fee2")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("rate_item_id2")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_code3")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_fee3")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("rate_item_id3")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_code4")        );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("free_fee4")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("rate_item_id4")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("base_tpremark")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("tpremark")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("rate_file_name")    );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("rate_time")         );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("acc_file_name")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("acc_time")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("dis_file_name")     );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("dis_time")          );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("busi_domain")       );
-		get.addColumn(Bytes.toBytes("info"),Bytes.toBytes("bill_end_day")      );
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("source_type"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("record_type"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("ni_pdp"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("msisdn"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("imsi_number"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("sgsn"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("msnc"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("lac"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("ra"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("cell_id"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("charging_id"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("ggsn"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("apnni"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("apnoi"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("pdp_type"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("spa"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("sgsn_change"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("cause_close"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("result"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("home_area_code"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("visit_area_code"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("user_type"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("fee_type"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("roam_type"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("service_type"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("start_date"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("start_time"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("call_duration"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("tariff1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("data_up1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("data_down1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("duration1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("tariff2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("data_up2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("data_down2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("duration2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("tariff3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("data_up3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("data_down3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("duration3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("tariff4"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("data_up4"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("data_down4"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("duration4"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("tariff5"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("data_up5"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("data_down5"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("duration5"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("tariff6"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("data_up6"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("data_down6"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("duration6"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("cfee"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("fee1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("fee2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("fee3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("total_fee"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("deal_time"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("file_no"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("error_code"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("cust_id"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("user_id"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("a_brand_id"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("pay_mode"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("a_serv_type"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("chan_no"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("office_code"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_code"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("billing_cycle"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("bill_start_day"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("revision"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("cdr_day"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("file_pp_name"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("visit_county"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("deduct_remark"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("deduct_remark2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("imei"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("recordextension"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("billinfo"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("rcdseqnum"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("apnni_groupid"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_item1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("product_id1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("instance_id1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("accu_user_id1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_item2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("product_id2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("instance_id2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("accu_user_id2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_item3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("product_id3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("instance_id3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("accu_user_id3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_item4"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free4"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("product_id4"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("instance_id4"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("accu_user_id4"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("ratemethod"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_code1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_fee1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("rate_item_id1"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_code2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_fee2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("rate_item_id2"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_code3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_fee3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("rate_item_id3"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_code4"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("free_fee4"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("rate_item_id4"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("base_tpremark"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("tpremark"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("rate_file_name"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("rate_time"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("acc_file_name"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("acc_time"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("dis_file_name"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("dis_time"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("busi_domain"));
+		get.addColumn(Bytes.toBytes("info"), Bytes.toBytes("bill_end_day"));
 		return get;
 	}
-	
+
 }
