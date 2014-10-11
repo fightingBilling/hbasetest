@@ -5,12 +5,16 @@
 
 * MR的第三方Jar形式，测试好像不行，jar并没有进行上传...
 
+`
 	hadoop jar hbasetest-1.0.0.jar com.wankun.hbasetest.mapreduce.WordCountHBase -libjars /usr/lib/hbase/lib/hbase-common-0.96.1.1-cdh5.0.1.jar,/usr/lib/hbase/lib/hbase-client-0.96.1.1-cdh5.0.1.jar,/usr/lib/hbase/lib/hbase-server-0.96.1.1-cdh5.0.1.jar
+`
 	
 * 直接以java命令允许，不行，虽然在本地JVM中有了CLASSPATH类库，但是在远端JVM启动的时候，CLASSPATH应该是没有携带过来
 
+`
 	java -cp hbasetest-1.0.0.jar:/usr/lib/hbase/*:/usr/lib/hbase/lib/*:/usr/lib/hadoop/*:/usr/lib/hadoop/lib/*:/usr/lib/hadoop-hdfs/*:/usr/lib/hadoop-hdfs/lib/*:/usr/lib/hadoop-mapreduce/*:/usr/lib/hadoop-mapreduce/lib/*:/usr/lib/hadoop-yarn/*:/usr/lib/hadoop-yarn/lib/* com.wankun.hbasetest.mapreduce.WordCountHBase
-	
+`
+`	
 	org.apache.hadoop.yarn.exceptions.YarnRuntimeException: java.lang.RuntimeException: java.lang.ClassNotFoundException: Class org.apache.hadoop.hbase.mapreduce.TableOutputFormat not found
         at org.apache.hadoop.mapreduce.v2.app.MRAppMaster.createOutputCommitter(MRAppMaster.java:473)
         at org.apache.hadoop.mapreduce.v2.app.MRAppMaster.serviceInit(MRAppMaster.java:374)
@@ -30,6 +34,7 @@ Caused by: java.lang.ClassNotFoundException: Class org.apache.hadoop.hbase.mapre
         at org.apache.hadoop.conf.Configuration.getClassByName(Configuration.java:1801)
         at org.apache.hadoop.conf.Configuration.getClass(Configuration.java:1893)
         ... 10 more
+`        
         
 * Fat Jar形式 ： 将程序需要的hbase包打成一个包进行运行 （未测试）
 
