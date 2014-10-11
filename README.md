@@ -25,3 +25,11 @@ hbase shell
 truncate 'test_info'
 scan 'test_info'
 count 'test_info'
+
+
+## 20141011 修改
+
+* 完成对测试代码的重构
+* 测试结果：
+	** 在Eclipse中测试结果是程序打包后在HBase集群中测试的1/5
+	** HBase操作的字段越多，效率下降的越快 

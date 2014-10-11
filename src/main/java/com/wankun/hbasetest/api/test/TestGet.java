@@ -28,7 +28,7 @@ public class TestGet extends HBaseTest {
 
 	@Override
 	public void test(HTable table) throws Exception {
-		getLong(table);
+		getShort(table);
 	}
 
 	/**
