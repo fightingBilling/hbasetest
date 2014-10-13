@@ -26,7 +26,7 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
  * 程序说明：读取hdfs文件内容，统计单词次数，写入到hbase
  * 
  * <pre>
- * 程序运行：hadoop jar hbasetest-1.0.0.jar com.wankun.hbasetest.mapreduce.WordCountHBase
+ * 程序运行：hadoop jar hbasetest-1.0.0.jar com.wankun.hbasetest.mapreduce.MyHbaseMr
  * </pre>
  * 
  * <pre>
@@ -39,7 +39,7 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
  * @date 2014年10月11日
  * @version 1.0
  */
-public class WordCountHBase {
+public class MyHbaseMr {
 
 	public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
 		private IntWritable i = new IntWritable(1);
@@ -92,7 +92,7 @@ public class WordCountHBase {
 		conf.set(TableOutputFormat.OUTPUT_TABLE, tableName);
 		createHBaseTable(tableName);
 		Job job = new Job(conf, "WordCount table with " + input);
-		job.setJarByClass(WordCountHBase.class);
+		job.setJarByClass(MyHbaseMr.class);
 		job.setNumReduceTasks(3);
 		job.setMapperClass(Map.class);
 		job.setReducerClass(Reduce.class);

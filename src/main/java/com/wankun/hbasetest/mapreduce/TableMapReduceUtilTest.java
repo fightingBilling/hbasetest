@@ -34,7 +34,7 @@ import org.apache.hadoop.mapreduce.Job;
  * </pre>
  * 
  * <pre>
- * 程序运行：hadoop jar hbasetest-1.0.0.jar com.wankun.hbasetest.mapreduce.WordStat
+ * 程序运行：hadoop jar hbasetest-1.0.0.jar com.wankun.hbasetest.mapreduce.TableMapReduceUtilTest
  * </pre>
  * 
  * <pre>
@@ -46,7 +46,7 @@ import org.apache.hadoop.mapreduce.Job;
  * @date 2014年10月11日
  * @version 1.0
  */
-public class WordStat {
+public class TableMapReduceUtilTest {
 
 	public static class MyMapper extends TableMapper<Text, IntWritable> {
 
@@ -95,7 +95,7 @@ public class WordStat {
 
 		Configuration conf = HBaseConfiguration.create();
 		Job job = Job.getInstance(conf, "wordstat");
-		job.setJarByClass(WordStat.class);
+		job.setJarByClass(TableMapReduceUtilTest.class);
 
 		Scan scan = new Scan();
 		// 指定要查询的列族
