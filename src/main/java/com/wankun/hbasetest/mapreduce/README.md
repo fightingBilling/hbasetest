@@ -14,7 +14,6 @@
 `
 	java -cp hbasetest-1.0.0.jar:/usr/lib/hbase/*:/usr/lib/hbase/lib/*:/usr/lib/hadoop/*:/usr/lib/hadoop/lib/*:/usr/lib/hadoop-hdfs/*:/usr/lib/hadoop-hdfs/lib/*:/usr/lib/hadoop-mapreduce/*:/usr/lib/hadoop-mapreduce/lib/*:/usr/lib/hadoop-yarn/*:/usr/lib/hadoop-yarn/lib/* com.wankun.hbasetest.mapreduce.WordCountHBase
 `
-<br>
 `	
 	org.apache.hadoop.yarn.exceptions.YarnRuntimeException: java.lang.RuntimeException: java.lang.ClassNotFoundException: Class org.apache.hadoop.hbase.mapreduce.TableOutputFormat not found
         at org.apache.hadoop.mapreduce.v2.app.MRAppMaster.createOutputCommitter(MRAppMaster.java:473)
