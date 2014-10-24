@@ -1,16 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.wankun</groupId>
-  <artifactId>hbasetest</artifactId>
-  <version>1.0.0</version>
-  <packaging>jar</packaging>
+	<groupId>com.wankun</groupId>
+	<artifactId>hbasetest</artifactId>
+	<version>1.0.0</version>
+	<packaging>jar</packaging>
 
-  <name>hbasetest</name>
-  <url>http://maven.apache.org</url>
+	<name>hbasetest</name>
+	<url>http://maven.apache.org</url>
 
- <repositories>
+	<repositories>
 		<repository>
 			<id>cloudera</id>
 			<url>https://repository.cloudera.com/cloudera/cloudera-repos</url>
@@ -21,7 +21,9 @@
 		<maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<hadoop.version>2.3.0-cdh5.0.1</hadoop.version>
-		<hbase.version>0.98.1-cdh5.1.0</hbase.version>
+		<hbase.version>0.96.1.1-cdh5.0.1</hbase.version>
+
+		<mysql.version>5.1.15</mysql.version>
 		<junit.version>4.11</junit.version>
 	</properties>
 
@@ -63,5 +65,12 @@
 			<artifactId>hbase-thrift</artifactId>
 			<version>${hbase.version}</version>
 		</dependency>
-  </dependencies>
+
+		<!-- mysql sources -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysql.version}</version>
+		</dependency>
+	</dependencies>
 </project>
